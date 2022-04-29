@@ -1,0 +1,28 @@
+# exclude
+*
+
+# include
+!__checks__/
+!__checks__/**
+!__tests__/
+!__tests__/**
+!controllers/
+!controllers/**
+!databases/
+!databases/**
+!errors/
+!errors/**
+!models/
+!models/**
+!routes/
+!routes/**
+!wares/
+!wares/**
+!.gitignore
+!app.js
+!index.js
+!.babelrc
+!.eslintrc.json
+!package.json
+!package-lock.json
+!README.md

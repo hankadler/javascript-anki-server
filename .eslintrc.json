@@ -1,0 +1,22 @@
+{
+  "env": {
+    "es2021": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "airbnb-base"
+  ],
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "rules":{
+    "no-console": "off",
+    "comma-dangle": "off",
+    "no-underscore-dangle": "off",
+    "quotes": ["error", "double"],
+    "func-names": "off",
+    "object-curly-newline": "off",
+    "function-paren-newline": "off"
+  }
+}
