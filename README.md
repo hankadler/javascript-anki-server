@@ -1,5 +1,7 @@
 # Anki Server
 
+An express app for learning with flashcards
+
 ## Setup
 
 ### Node
