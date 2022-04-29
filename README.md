@@ -6,8 +6,7 @@ An express app for learning with flashcards
 
 ### Node
 
-<span style="color:red">**WARNING:**</span> This code uses ES6+ ``import/export`` syntax. To
- prevent errors do the following:
+This code uses ES6+ ``import/export`` syntax. To prevent errors do the following:
 
 - When executing directly:
 
