@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 import { cardSchema } from "./Card";
 
 const deckSchema = new mongoose.Schema({
+  image: {
+    type: String,
+    default: ""
+  },
   title: {
     type: String,
     required: true,
@@ -52,6 +56,18 @@ deckSchema.methods.updateCard = async function (cardId, { question, answer }) {
   if (question) card.question = question;
   if (answer) card.answer = answer;
   return this.parent().save();
+};
+
+// don't make async!
+deckSchema.methods.searchCards = function (query) {
+  const result = new Set();
+  Object.entries(query).forEach(([k, v]) => {
+    const key = k.toLowerCase();
+    const value = v.toLowerCase();
+    const cards = this.cards.filter((card) => card[key].toLowerCase().match(value));
+    if (cards.length) result.add(...cards);
+  });
+  return [...result];
 };
 
 const Deck = mongoose.model("Deck", deckSchema);

@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
       },
       "Duplicate deck title!"
     ]
+  },
+  activated: {
+    type: Boolean,
+    default: false,
   }
 });
 
@@ -47,6 +51,16 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password")) await this.updatePassword(this.password, this.passwordAgain);
   return next();
 });
+
+userSchema.statics.fromToken = async function (token) {
+  // is token signature correct?
+  const payload = await jwt.verify(token, process.env.JWT_SECRET);
+  if (!payload) throw new AuthError("Invalid token signature!");
+  // get user from payload id
+  const user = await this.findById(payload.id);
+  if (!user) throw new AuthError("Invalid token payload!");
+  return user;
+};
 
 userSchema.statics.isAuth = async function (token) {
   // is token signature correct?
@@ -75,10 +89,8 @@ userSchema.methods.updatePassword = async function (password, passwordAgain) {
   this.passwordModifiedAt = Math.floor(Date.now() / 1000).toString();
 };
 
-userSchema.methods.getToken = async function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
-  });
+userSchema.methods.getToken = async function (expiresIn = process.env.JWT_EXPIRES_IN) {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, { expiresIn });
 };
 
 userSchema.methods.pushDeck = async function (deck) {
@@ -103,11 +115,37 @@ userSchema.methods.removeDeck = async function (deckId) {
   return { acknowledged, deletedCount };
 };
 
-userSchema.methods.updateDeck = async function (deckId, { title, cards }) {
+userSchema.methods.updateDeck = async function (deckId, { image, title, cards }) {
   const deck = await this.decks.id(deckId);
+  if (image !== undefined) deck.image = image;
   if (title) deck.title = title;
   if (cards) deck.cards = cards;
-  return this.save();
+  this.save();
+  return deck;
+};
+
+userSchema.methods.searchDecks = async function (query) {
+  const result = new Set([]);
+  Object.entries(query).forEach(([k, v]) => {
+    // make matching case insensitive
+    const key = k.toLowerCase();
+    const value = v.toLowerCase();
+    // search decks or cards?
+    if (key === "title") {
+      // decks
+      const decks = this.decks.filter((deck) => deck[key].toLowerCase().match(value));
+      if (decks.length) result.add(...decks);
+    } else {
+      // cards
+      this.decks.forEach((deck) => {
+        const subQuery = {};
+        subQuery[k] = v;
+        const cards = deck.searchCards(subQuery); // don't make searchCards async!
+        if (cards.length) result.add(deck);
+      });
+    }
+  });
+  return [...result];
 };
 
 const User = mongoose.model("User", userSchema);

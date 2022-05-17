@@ -9,7 +9,8 @@ const handleError = (nodeEnv = "dev") => (err, req, res, next) => {
       }
     };
     if (nodeEnv === "dev") response.error.stack = err.stack;
-    return res.status(err.code || 400).json(response);
+    const statusCode = err.code < 600 ? err.code : 400;
+    return res.status(statusCode).json(response);
   }
   return next();
 };
