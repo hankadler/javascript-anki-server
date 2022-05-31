@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 /* routes */
+app.use(express.static("../client/dist"));
 app.get("/anki/v1", (req, res) => res.status(200).json({ status: "pass", message: "Welcome!" }));
 app.use("/anki/v1", authRouter);
 app.use(restrictAccess());
