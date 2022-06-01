@@ -28,6 +28,7 @@ NODE_OPTIONS=--experimental-vm-modules;NODE_NO_WARNINGS=1  # test config
 2. Define proper values for the following environment variables:
 
    - ``NODE_ENV`` - dev, test, or prod
+   - ``HOST`` - prod app url
    - ``PORT`` - port number
    - ``DB_DEV`` - dev mongoDB url
    - ``DB_TEST`` - test mongoDB url
@@ -35,6 +36,13 @@ NODE_OPTIONS=--experimental-vm-modules;NODE_NO_WARNINGS=1  # test config
    - ``JWT_SECRET`` - jsonwebtoken secret key
    - ``JWT_EXPIRES_IN`` - jsonwebtoken expiration, e.g., 1h
    - ``COOKIE_MAX_AGE`` - jsonwebtoken cookie expiration in seconds
+   - ``EMAIL_USER`` - address from which to send app emails
+   - ``EMAIL_PASS`` - email account password
+   - ``EMAIL_HOST`` - e.g. smtp.gmail.com
+   - ``EMAIL_PORT`` - e.g. 465
+   - ``EMAIL_CLIENT_ID`` - email api client id
+   - ``EMAIL_CLIENT_SECRET`` - email api client id
+   - ``EMAIL_REFRESH_TOKEN`` - email api refresh token
 
 ## Usage
 

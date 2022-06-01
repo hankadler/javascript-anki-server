@@ -4,6 +4,12 @@ import User from "../models/User";
 import FieldError from "../errors/FieldError";
 import ValueError from "../errors/ValueError";
 
+const getHomeURL = async () => (
+  process.env.NODE_ENV === "prod"
+    ? process.env.HOST
+    : `http://localhost:${process.env.PORT}`
+);
+
 const getOrDie = async (obj, ...keys) => {
   const values = {};
   keys.forEach((key) => {
@@ -130,14 +136,24 @@ const selectFields = async (arr, queryOpts) => {
 };
 
 const sendEmail = async (to, subject, message, isPlain = false) => {
+  let auth = {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  };
+  if (process.env.NODE_ENV === "prod") {
+    auth = {
+      type: "OAuth2",
+      user: process.env.EMAIL_USER,
+      clientId: process.env.EMAIL_CLIENT_ID,
+      clientSecret: process.env.EMAIL_CLIENT_SECRET,
+      refreshToken: process.env.EMAIL_REFRESH_TOKEN
+    };
+  }
   const transporter = createTransport({
     host: process.env.EMAIL_HOST,
     port: parseInt(process.env.EMAIL_PORT, 10),
     secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
+    auth
   });
 
   const mailOptions = {
@@ -156,4 +172,14 @@ const sendEmail = async (to, subject, message, isPlain = false) => {
   return transporter.sendMail(mailOptions);
 };
 
-export { getOrDie, getUser, getDeck, parseQuery, paginate, sortDocs, selectFields, sendEmail };
+export {
+  getHomeURL,
+  getOrDie,
+  getUser,
+  getDeck,
+  parseQuery,
+  paginate,
+  sortDocs,
+  selectFields,
+  sendEmail
+};

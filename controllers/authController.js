@@ -1,20 +1,20 @@
 import cookie from "cookie";
 import User from "../models/User";
-import { getOrDie, sendEmail } from "./helpers";
+import { getHomeURL, getOrDie, sendEmail } from "./helpers";
 import AuthError from "../errors/AuthError";
 
 const signUp = async (req, res) => {
   const { email, password, passwordAgain } = await getOrDie(
     req.body, "email", "password", "passwordAgain"
   );
-  const base = process.env.NODE_ENV === "prod" ? process.env.HOST : `localhost:${process.env.PORT}`;
   const user = await User.create({ email, password, passwordAgain }).catch((err) => {
     if (err.code === 11000) throw new AuthError("There's already an account with that email!", 400);
   });
   const token = await user.getToken("7d");
+  const homeURL = await getHomeURL();
   const message = `
     <h3>Anki Account Activation</h3>
-    <p>Click <a href="http://${base}/anki/v1/activate/${token}">here</a> to activate account.</p>
+    <p>Click <a href="${homeURL}/anki/v1/activate/${token}">here</a> to activate account.</p>
     <p>Activation window will expire in 7 days.</p>
   `;
   const info = await sendEmail(email, "Activate Anki Account", message);
@@ -26,8 +26,7 @@ const activate = async (req, res) => {
   let user = await User.fromToken(token);
   if (!user) throw new AuthError("Token invalid or expired!");
   user = await User.findByIdAndUpdate(user._id, { activated: true });
-  const url = process.env.NODE_ENV === "prod" ? process.env.URL_PROD : process.env.URL_DEV;
-  return res.redirect(301, url);
+  return res.redirect(301, await getHomeURL());
 };
 
 const signIn = async (req, res) => {
