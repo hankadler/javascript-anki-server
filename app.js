@@ -3,8 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import express from "express";
 import morgan from "morgan";
-import restrictAccess from "./wares/restrictAccess";
 import handleError from "./wares/handleError";
+import staticRoutes from "./routes/staticRoutes";
 import authRouter from "./routes/authRouter";
 import userRouter from "./routes/userRouter";
 
@@ -19,10 +19,9 @@ app.use(cors());
 app.use(helmet({ contentSecurityPolicy: false }));
 
 /* routes */
-app.use(express.static("../client/dist"));
+staticRoutes.forEach((route) => app.use(route, express.static("../client/dist")));
 app.get("/anki/v1", (req, res) => res.status(200).json({ status: "pass", message: "Welcome!" }));
 app.use("/anki/v1", authRouter);
-app.use(restrictAccess());
 app.use("/anki/v1/users", userRouter);
 app.use(handleError(nodeEnv));
 
