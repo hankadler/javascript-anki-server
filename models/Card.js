@@ -5,13 +5,13 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    maxLength: 280
+    maxLength: 300
   },
   answer: {
     type: String,
     required: true,
     trim: true,
-    maxLength: 280
+    maxLength: 600
   }
 }, {
   autoCreate: false,
